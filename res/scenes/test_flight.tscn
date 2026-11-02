@@ -1,0 +1,134 @@
+[gd_scene format=3 uid="uid://htwa4fpn6pbx"]
+
+[ext_resource type="Script" uid="uid://2rqng5l7bdvr" path="res://res/scripts/flight/drone_controller.gd" id="1_ll4tf"]
+[ext_resource type="Script" uid="uid://kq7wwyncfcov" path="res://res/scripts/environment/world_setup.gd" id="1_nte6x"]
+[ext_resource type="Script" uid="uid://da307s4metnsh" path="res://res/scripts/environment/wind_system.gd" id="2_aip15"]
+[ext_resource type="Script" uid="uid://ce7jkdw7hr1gj" path="res://res/scripts/flight/drone_visual.gd" id="2_kroim"]
+[ext_resource type="Script" uid="uid://bqylngple4w84" path="res://res/scripts/environment/terrain_generator.gd" id="2_v6jwm"]
+[ext_resource type="Script" uid="uid://dxcph3ra4sdsu" path="res://res/scripts/camera/chase_camera.gd" id="3_13qhi"]
+[ext_resource type="Script" uid="uid://d0nml7wghx1ue" path="res://res/scripts/mission/home_base.gd" id="3_imk8n"]
+[ext_resource type="Script" uid="uid://bhq8j5jnilnbg" path="res://res/scripts/ui/flight_debug.gd" id="4_xresq"]
+[ext_resource type="Script" uid="uid://dt6us7w1h3epj" path="res://res/scripts/ui/rescue_hud.gd" id="6_upfle"]
+[ext_resource type="Script" uid="uid://j3e0r35boxkl" path="res://res/scripts/camera/vision_post_process.gd" id="7_sb4l2"]
+[ext_resource type="Script" uid="uid://ouk5gs7a3fgx" path="res://res/scripts/mission/mission_manager.gd" id="10_ph6jx"]
+[ext_resource type="Script" uid="uid://d0oij62fqwork" path="res://res/scripts/mission/payload_system.gd" id="11_1ojgg"]
+[ext_resource type="Script" uid="uid://cm5cvj1whc0xk" path="res://res/scripts/mission/rescue_sensor.gd" id="12_gfewf"]
+[ext_resource type="Script" uid="uid://lra8wi5xhyf4" path="res://res/scripts/ui/mission_hud.gd" id="15_a8fbo"]
+[ext_resource type="Script" uid="uid://bki2fv53r0tiv" path="res://res/scripts/ui/guide_panel.gd" id="16_v6jwm"]
+[ext_resource type="Script" uid="uid://sxr77cu41r7d" path="res://res/scripts/environment/weather_system.gd" id="17_imk8n"]
+[ext_resource type="Script" uid="uid://bpo7whidi362m" path="res://res/scripts/flight/drone_audio.gd" id="18_ph6jx"]
+[ext_resource type="Script" uid="uid://bjehwuhg4dhkp" path="res://res/scripts/ui/scene_nav.gd" id="19_1ojgg"]
+
+[sub_resource type="Environment" id="Environment_ph6jx"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_o88mx"]
+size = Vector3(0.45, 0.12, 0.45)
+
+[node name="TestFlight" type="Node3D" unique_id=1535401272]
+
+[node name="World" type="WorldEnvironment" parent="." unique_id=174276816 node_paths=PackedStringArray("sun")]
+environment = SubResource("Environment_ph6jx")
+script = ExtResource("1_nte6x")
+sun = NodePath("../Sun")
+
+[node name="Sun" type="DirectionalLight3D" parent="." unique_id=1717081839]
+transform = Transform3D(1, 0, 0, 0, 0.64278764, 0.76604444, 0, -0.76604444, 0.64278764, 0, 0, 0)
+light_color = Color(0.9174454, 0.90087855, 1.540184e-06, 1)
+
+[node name="Terrain" type="Node3D" parent="." unique_id=647376617]
+script = ExtResource("2_v6jwm")
+
+[node name="Home" type="Node3D" parent="." unique_id=362280430 node_paths=PackedStringArray("terrain")]
+script = ExtResource("3_imk8n")
+terrain = NodePath("../Terrain")
+
+[node name="Drone" type="RigidBody3D" parent="." unique_id=940022152 node_paths=PackedStringArray("wind_system")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.3, 0)
+collision_mask = 3
+script = ExtResource("1_ll4tf")
+thrust_to_weight = 4.0
+wind_system = NodePath("../Wind")
+capacity_wh = 90.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Drone" unique_id=787134267]
+shape = SubResource("BoxShape3D_o88mx")
+
+[node name="Visual" type="Node3D" parent="Drone" unique_id=992326166]
+script = ExtResource("2_kroim")
+
+[node name="Wind" type="Node" parent="." unique_id=731346799]
+script = ExtResource("2_aip15")
+enabled = false
+
+[node name="Camera" type="Camera3D" parent="." unique_id=610289705 node_paths=PackedStringArray("target")]
+current = true
+script = ExtResource("3_13qhi")
+target = NodePath("../Drone")
+
+[node name="VisionFX" type="CanvasLayer" parent="." unique_id=1266225753]
+script = ExtResource("7_sb4l2")
+
+[node name="Mission" type="Node" parent="." unique_id=767352765 node_paths=PackedStringArray("terrain", "drone", "payload", "home", "weather")]
+script = ExtResource("10_ph6jx")
+terrain = NodePath("../Terrain")
+drone = NodePath("../Drone")
+payload = NodePath("../Payload")
+home = NodePath("../Home")
+weather = NodePath("../Weather")
+
+[node name="Payload" type="Node" parent="." unique_id=881709772 node_paths=PackedStringArray("drone")]
+script = ExtResource("11_1ojgg")
+drone = NodePath("../Drone")
+
+[node name="Sensor" type="Node" parent="." unique_id=492139346]
+script = ExtResource("12_gfewf")
+
+[node name="HUD" type="CanvasLayer" parent="." unique_id=1249901457]
+layer = 2
+
+[node name="FlightInfo" type="Label" parent="HUD" unique_id=1742953514 node_paths=PackedStringArray("drone")]
+visible = false
+offset_right = 40.0
+offset_bottom = 23.0
+script = ExtResource("4_xresq")
+drone = NodePath("../../Drone")
+
+[node name="RescueHUD" type="Control" parent="HUD" unique_id=1865759294 node_paths=PackedStringArray("drone")]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("6_upfle")
+drone = NodePath("../../Drone")
+
+[node name="MissionHUD" type="Control" parent="HUD" unique_id=227743642 node_paths=PackedStringArray("drone", "mission", "payload")]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("15_a8fbo")
+drone = NodePath("../../Drone")
+mission = NodePath("../../Mission")
+payload = NodePath("../../Payload")
+
+[node name="GuideHUD" type="Control" parent="HUD" unique_id=156168796]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("16_v6jwm")
+
+[node name="Weather" type="Node" parent="." unique_id=716099359 node_paths=PackedStringArray("world", "wind", "drone")]
+script = ExtResource("17_imk8n")
+world = NodePath("../World")
+wind = NodePath("../Wind")
+drone = NodePath("../Drone")
+
+[node name="Audio" type="Node" parent="." unique_id=358591805 node_paths=PackedStringArray("drone", "weather")]
+script = ExtResource("18_ph6jx")
+drone = NodePath("../Drone")
+weather = NodePath("../Weather")
+
+[node name="Nav" type="Node" parent="." unique_id=1232966322]
+script = ExtResource("19_1ojgg")
+menu_scene = "uid://bt0lb3ftlnfem"

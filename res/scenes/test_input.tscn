@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://bt116oj3kqyua"]
+
+[ext_resource type="Script" uid="uid://parlu0h7rpsu" path="res://res/scripts/input/input_debug.gd" id="1_p74gf"]
+
+[node name="Label" type="Label" unique_id=2112384493]
+offset_right = 40.0
+offset_bottom = 23.0
+script = ExtResource("1_p74gf")

@@ -1,6 +1,0 @@
-[gd_scene format=3 uid="uid://bacyri5kb5en0"]
-
-[ext_resource type="Script" uid="uid://lqe050a0mjgc" path="res://res/scripts/editor/map_editor.gd" id="1_vga7x"]
-
-[node name="MapEditor" type="Node3D" unique_id=224939433]
-script = ExtResource("1_vga7x")
